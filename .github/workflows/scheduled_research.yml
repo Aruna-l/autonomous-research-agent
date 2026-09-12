@@ -1,0 +1,37 @@
+name: Scheduled Research Run
+
+# Runs the automation script daily, plus allows manual triggering from
+# the GitHub Actions tab (handy for demoing this in an interview).
+on:
+  schedule:
+    - cron: "0 6 * * *"   # every day at 06:00 UTC
+  workflow_dispatch: {}     # manual "Run workflow" button
+
+jobs:
+  run-research-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run scheduled research
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+        run: python -m automation.scheduled_runner
+
+      - name: Commit generated reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add outputs/reports/*.md
+          git diff --staged --quiet || git commit -m "Automated research reports [skip ci]"
+          git push

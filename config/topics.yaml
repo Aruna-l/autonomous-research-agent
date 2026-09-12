@@ -1,0 +1,8 @@
+# config/topics.yaml
+# List of topics the automation runner will research on each scheduled run.
+# Add/remove topics here without touching any code.
+
+topics:
+  - "Latest developments in AI agent frameworks"
+  - "Current state of renewable energy adoption in India"
+  - "Recent breakthroughs in quantum computing"
